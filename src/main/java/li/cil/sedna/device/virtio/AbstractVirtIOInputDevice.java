@@ -33,7 +33,7 @@ public abstract class AbstractVirtIOInputDevice extends AbstractVirtIODevice {
     private static final int VIRTIO_INPUT_CFG_SUBSEL_OFFSET = 0x1;
     private static final int VIRTIO_INPUT_CFG_SIZE_OFFSET = 0x2;
     private static final int VIRTIO_INPUT_CFG_UNION_OFFSET = 0x8;
-    private static final int VIRTIO_INPUT_CFG_UNION_SIZE = 128;
+    private static final int VIRTIO_INPUT_CFG_UNION_SIZE = 160;
 
     private static final int VIRTQ_EVENT = 0;
     private static final int VIRTQ_STATUS = 1;
@@ -47,6 +47,43 @@ public abstract class AbstractVirtIOInputDevice extends AbstractVirtIODevice {
             .configSpaceSize(256)
             .queueCount(2)
             .build());
+    }
+
+
+    /**
+     * Struct to hold the absolute axis information.
+     * <p>
+     *     This is used to describe the properties of an absolute axis.
+     *     <p>
+     *         struct virtio_input_absinfo {
+     *         __le32 min;        // Minimum value
+     *         __le32 max;        // Maximum value
+     *         __le32 fuzz;       // Fuzz value
+     *         __le32 flat;       // Flat value
+     *         __le32 resolution; // Resolution value
+     *         };
+     *      </p>
+     *          <p>
+     *              min: Minimum value of the axis.
+     *              max: Maximum value of the axis.
+     *              fuzz: Fuzz value, used to determine the minimum change in value that is considered significant.
+     *              flat: Flat value, used to determine the range of values that are considered "flat" or "dead".
+     *              resolution: Resolution value, used to determine the precision of the axis.
+     *      </p>
+     * </p>
+     *
+     *
+     **/
+    record ABSInfo(int min, int max, int fuzz, int flat, int resolution) {
+        public byte[] toByteArray() {
+            ByteBuffer buffer = ByteBuffer.allocate(20);
+            buffer.putInt(min);
+            buffer.putInt(max);
+            buffer.putInt(fuzz);
+            buffer.putInt(flat);
+            buffer.putInt(resolution);
+            return buffer.array();
+        }
     }
 
     /**
